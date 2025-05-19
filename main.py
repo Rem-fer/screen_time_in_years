@@ -17,10 +17,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-#This is temporary to create the DB(once)
-with app.app_context():
-    db.create_all()
-
 
 class user_data(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -84,6 +80,9 @@ def home():
     return render_template("index_wmobile.html", results = results)
 
 
+#This is temporary to create the DB(once)
+with app.app_context():
+    db.create_all()
 
 if __name__ == "__main__":
     app.run()
