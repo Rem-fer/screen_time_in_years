@@ -1,0 +1,12 @@
+# Secret config
+.env
+
+# Python environment
+venv/
+
+# Bytecode and cache
+__pycache__/
+*.pyc
+
+# macOS system files
+.DS_Store

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Screentime In Years</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+      padding: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    form {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: 30px auto;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .form-section {
+      margin-bottom: 20px;
+    }
+
+    .gender-options {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .gender-options label {
+      margin-right: 5px;
+      font-weight: normal;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .results {
+      background-color: #eaf6ff;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: 30px auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .results p {
+      margin: 15px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Welcome to the Screentime In Years page</h1>
+
+  <form action="" method="POST">
+    <div class="form-section">
+      <p>Please access your screentime data and enter the hour and minutes below</p>
+
+      <label for="hours">Hours</label>
+      <input type="number" id="hours" name="hours" placeholder="Enter the hours" required>
+
+      <label for="minutes">Minutes</label>
+      <input type="number" id="minutes" name="minutes" placeholder="Enter the minutes" required>
+    </div>
+
+    <div class="form-section">
+      <label for="age">Type your age</label>
+      <input type="number" id="age" name="age" placeholder="Enter your age" required>
+    </div>
+
+    <div class="form-section">
+      <label for="gender">Gender</label>
+      <div class="gender-options">
+        <label for="male">Male</label>
+        <input type="radio" id="male" name="gender" value="male" required>
+
+        <label for="female">Female</label>
+        <input type="radio" id="female" name="gender" value="female">
+      </div>
+    </div>
+
+    <div>
+      <button type="submit">Calculate</button>
+    </div>
+  </form>
+
+  {% if results %}
+  <div class="results">
+    <div>
+      {% if results.yearly_summary["months"] %}
+        <p>That makes a yearly screentime of: <strong>{{results.yearly_summary["months"]}}</strong> months and <strong>{{results.yearly_summary["days"]}}</strong> days.</p>
+      {% else %}
+        <p>That makes a yearly screentime of: <strong>{{results.yearly_summary["days"]}}</strong> days.</p>
+      {% endif %}
+    </div>
+
+    <div>
+      {% if results.gender == "male" %}
+        <p>According to statistics, average life expectancy for males is 75.</p>
+      {% else %}
+        <p>According to statistics, average life expectancy for females is 82.</p>
+      {% endif %}
+    </div>
+
+    <div>
+      {% if results.lifetime_use["months"] %}
+        <p>If you keep using your phone for <strong>{{results.hours}}</strong> hours and <strong>{{results.minutes}}</strong> minutes a day, until the end of your expected lifespan, you would have spent approximately <strong>{{results.lifetime_use["years"]}}</strong> years and <strong>{{results.lifetime_use["months"]}}</strong> months on screens.</p>
+      {% else %}
+        <p>If you keep using your phone for <strong>{{results.hours}}</strong> hours and <strong>{{results.minutes}}</strong> minutes a day, you would have spent approximately <strong>{{results.lifetime_use["years"]}}</strong> years of screentime by the time you die.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+</body>
+</html>
