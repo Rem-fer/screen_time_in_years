@@ -81,8 +81,8 @@ def home():
 
 
 #This is temporary to create the DB(once)
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 if __name__ == "__main__":
     app.run()
