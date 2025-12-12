@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Screentime In Years</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        text-align: center;
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .subtitle {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+      }
+
+      .card {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+      }
+
+      .form-section {
+        margin-bottom: 25px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+      }
+
+      input[type="number"],
+      input[type="range"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      input[type="range"] {
+        padding: 0;
+        height: 8px;
+        background: #e0e0e0;
+        border: none;
+        cursor: pointer;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #667eea;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #667eea;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+      }
+
+      .range-value {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #667eea;
+        font-weight: bold;
+        margin-top: 5px;
+      }
+
+      .gender-options {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .gender-option {
+        flex: 1;
+        position: relative;
+      }
+
+      .gender-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+      }
+
+      .gender-option label {
+        display: block;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+      }
+
+      .gender-option input[type="radio"]:checked + label {
+        background-color: #667eea;
+        color: white;
+        border-color: #667eea;
+      }
+
+      .gender-option label:hover {
+        border-color: #667eea;
+      }
+
+      .results {
+        display: none;
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      .results.show {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .stat-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .stat-subtext {
+        font-size: 0.95rem;
+        opacity: 0.9;
+      }
+
+      .progress-section {
+        margin-top: 30px;
+      }
+
+      .progress-item {
+        margin-bottom: 25px;
+      }
+
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .progress-bar-container {
+        width: 100%;
+        height: 30px;
+        background-color: #e0e0e0;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        transition: width 1s ease-out;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 15px;
+        color: white;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .warning-box {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+
+      .warning-box h3 {
+        color: #856404;
+        margin-bottom: 10px;
+      }
+
+      .warning-box p {
+        color: #856404;
+        line-height: 1.6;
+      }
+
+      .life-expectancy-note {
+        background-color: #e3f2fd;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: #1976d2;
+      }
+
+      /* Mobile Styles */
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .card {
+          padding: 20px;
+        }
+
+        .stat-value {
+          font-size: 2rem;
+        }
+
+        .gender-options {
+          flex-direction: column;
+        }
+      }
+
+      /* Animation for counter */
+      @keyframes countUp {
+        from {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .animated {
+        animation: countUp 0.5s ease-out;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>⏰ Screentime In Years</h1>
+      <p class="subtitle">
+        Discover how much of your life you're spending looking at screens
+      </p>
+
+      <div class="card">
+        <form id="screentimeForm">
+          <div class="form-section">
+            <label for="hours">Daily Screentime - Hours</label>
+            <input
+              type="range"
+              id="hours"
+              name="hours"
+              min="0"
+              max="24"
+              value="0"
+              oninput="updateValues()"
+            />
+            <div class="range-value" id="hoursValue">0 hours</div>
+          </div>
+
+          <div class="form-section">
+            <label for="minutes">Daily Screentime - Minutes</label>
+            <input
+              type="range"
+              id="minutes"
+              name="minutes"
+              min="0"
+              max="59"
+              value="0"
+              oninput="updateValues()"
+            />
+            <div class="range-value" id="minutesValue">0 minutes</div>
+          </div>
+
+          <div class="form-section">
+            <label for="age">Your Age</label>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              placeholder="Enter your age"
+              min="1"
+              max="120"
+              required
+              oninput="updateValues()"
+            />
+          </div>
+
+          <div class="form-section">
+            <label>Gender</label>
+            <div class="gender-options">
+              <div class="gender-option">
+                <input
+                  type="radio"
+                  id="male"
+                  name="gender"
+                  value="male"
+                  required
+                  onchange="updateValues()"
+                />
+                <label for="male">Male</label>
+              </div>
+              <div class="gender-option">
+                <input
+                  type="radio"
+                  id="female"
+                  name="gender"
+                  value="female"
+                  onchange="updateValues()"
+                />
+                <label for="female">Female</label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="results" id="results">
+        <div class="card">
+          <div class="stat-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="stat-label">Your Daily Screentime</div>
+            <div class="stat-value" id="dailyTime">0 hours</div>
+            <div class="stat-subtext">Every single day</div>
+          </div>
+
+          <div class="stat-box" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <div class="stat-label">Per Year, That's</div>
+            <div class="stat-value" id="yearlyTime">0 days</div>
+            <div class="stat-subtext" id="yearlySubtext"></div>
+          </div>
+
+          <div class="stat-box" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+            <div class="stat-label">⚠️ By The Time You Die</div>
+            <div class="stat-value" id="lifetimeTime">0 years</div>
+            <div class="stat-subtext" id="lifetimeSubtext"></div>
+          </div>
+
+          <div style="background: #2c3e50; color: white; padding: 25px; border-radius: 15px; margin: 20px 0; text-align: center; font-size: 1.1rem; line-height: 1.6;">
+            <p id="dramaticMessage" style="margin: 0;">
+              If you keep using your phone for <strong id="dailyUsage">0 hours</strong> a day, 
+              by the time you die you would have spent <strong id="lifetimeUsage">0 years</strong> 
+              looking at a screen.
+            </p>
+          </div>
+
+          <div class="progress-section">
+            <h3 style="margin-bottom: 20px; color: #2c3e50; text-align: center;">
+              📊 How You'll Spend Your Remaining Life
+            </h3>
+            
+            <div style="display: flex; justify-content: center; margin: 30px 0;">
+              <div style="position: relative; width: 300px; height: 300px;">
+                <svg id="pieChart" width="300" height="300" viewBox="0 0 300 300">
+                  <!-- Background circle -->
+                  <circle cx="150" cy="150" r="140" fill="#f0f0f0" />
+                  
+                  <!-- Slices (will be drawn by JS) -->
+                  <path id="sleepSlice" fill="#9370DB" />
+                  <path id="workSlice" fill="#FFB84D" />
+                  <path id="screentimeSlice" fill="#FF3B3B" />
+                  <path id="otherSlice" fill="#4ECDC4" />
+                  
+                  <!-- Center circle for donut effect -->
+                  <circle cx="150" cy="150" r="80" fill="white" />
+                  
+                  <!-- Center text -->
+                  <text x="150" y="135" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">Your Life</text>
+                  <text x="150" y="155" text-anchor="middle" font-size="14" fill="#666" id="ageRangeText">Age 0-0</text>
+                  <text x="150" y="175" text-anchor="middle" font-size="12" fill="#999" id="totalYearsText">0 years</text>
+                </svg>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px;">
+              <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <div style="width: 20px; height: 20px; background: #9370DB; border-radius: 4px; margin: 0 auto 8px;"></div>
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 4px;">😴 Sleep</div>
+                <div style="font-weight: bold; color: #2c3e50;" id="legendSleep">0 years</div>
+                <div style="font-size: 0.75rem; color: #999;" id="legendSleepPercent">0%</div>
+              </div>
+              
+              <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <div style="width: 20px; height: 20px; background: #FFB84D; border-radius: 4px; margin: 0 auto 8px;"></div>
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 4px;">💼 Work</div>
+                <div style="font-weight: bold; color: #2c3e50;" id="legendWork">0 years</div>
+                <div style="font-size: 0.75rem; color: #999;" id="legendWorkPercent">0%</div>
+              </div>
+              
+              <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <div style="width: 20px; height: 20px; background: #FF3B3B; border-radius: 4px; margin: 0 auto 8px;"></div>
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 4px;">📱 Screens</div>
+                <div style="font-weight: bold; color: #2c3e50;" id="legendScreentime">0 years</div>
+                <div style="font-size: 0.75rem; color: #999;" id="legendScreentimePercent">0%</div>
+              </div>
+              
+              <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <div style="width: 20px; height: 20px; background: #4ECDC4; border-radius: 4px; margin: 0 auto 8px;"></div>
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 4px;">🌟 Living</div>
+                <div style="font-weight: bold; color: #2c3e50;" id="legendOther">0 years</div>
+                <div style="font-size: 0.75rem; color: #999;" id="legendOtherPercent">0%</div>
+              </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem; line-height: 1.5;">
+              <div>Based on averages: 8 hours sleep/day, 8 hours work/day (working years)</div>
+              <div style="margin-top: 5px;">From age <strong id="currentAge">0</strong> to <strong id="endAge">0</strong></div>
+            </div>
+          </div>
+
+          <div class="life-expectancy-note" id="lifeExpectancyNote"></div>
+
+          <div class="warning-box" id="warningBox" style="display: none">
+            <h3>⚠️ That's a significant amount of time!</h3>
+            <p id="warningText"></p>
+          </div>
+
+          <div id="saveStatus" style="display: none; background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-top: 20px; text-align: center;">
+            ✅ Your data has been saved anonymously to help improve awareness
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Database saving functionality
+      async function saveToDatabase(hours, minutes, age, gender) {
+        try {
+          const response = await fetch('/save-data', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              hours: hours,
+              minutes: minutes,
+              age: age,
+              gender: gender
+            })
+          });
+          
+          if (response.ok) {
+            console.log('Data saved successfully');
+            // Optional: Show success message
+            const statusDiv = document.getElementById('saveStatus');
+            if (statusDiv) {
+              statusDiv.style.display = 'block';
+              setTimeout(() => {
+                statusDiv.style.display = 'none';
+              }, 3000);
+            }
+          }
+        } catch (error) {
+          console.error('Error saving data:', error);
+          // Don't break user experience if save fails
+        }
+      }
+
+      // Debounce function to avoid saving too frequently
+      let saveTimeout;
+      function debouncedSave(hours, minutes, age, gender) {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          saveToDatabase(hours, minutes, age, gender);
+        }, 2000); // Wait 2 seconds after user stops adjusting
+      }
+
+      function updateValues() {
+        const hours = parseInt(document.getElementById("hours").value);
+        const minutes = parseInt(document.getElementById("minutes").value);
+        const age = parseInt(document.getElementById("age").value);
+        const gender = document.querySelector('input[name="gender"]:checked');
+
+        // Update display values
+        document.getElementById("hoursValue").textContent = `${hours} ${
+          hours === 1 ? "hour" : "hours"
+        }`;
+        document.getElementById("minutesValue").textContent = `${minutes} ${
+          minutes === 1 ? "minute" : "minutes"
+        }`;
+
+        // Only calculate if we have all required values
+        if (!age || !gender || (hours === 0 && minutes === 0)) {
+          document.getElementById("results").classList.remove("show");
+          return;
+        }
+
+        calculateScreentime(hours, minutes, age, gender.value);
+        
+        // Save to database after 2 seconds of no changes
+        debouncedSave(hours, minutes, age, gender.value);
+      }
+
+      function calculateScreentime(hours, minutes, age, gender) {
+        // Life expectancy based on gender
+        const lifeExpectancy = gender === "male" ? 75 : 82;
+
+        // Convert to total minutes per day
+        const dailyMinutes = hours * 60 + minutes;
+        const dailyHours = dailyMinutes / 60;
+
+        // Yearly calculation
+        const yearlyHours = dailyHours * 365;
+        const yearlyDays = yearlyHours / 24;
+        const yearlyMonths = Math.floor(yearlyDays / 30);
+        const yearlyDaysRemainder = Math.floor(yearlyDays % 30);
+
+        // Percentage of year
+        const yearlyPercent = (yearlyDays / 365) * 100;
+
+        // Lifetime calculation
+        const yearsRemaining = lifeExpectancy - age;
+        const lifetimeHours = dailyHours * 365 * yearsRemaining;
+        const lifetimeDays = lifetimeHours / 24;
+        const lifetimeYears = Math.floor(lifetimeDays / 365);
+        const lifetimeMonths = Math.floor((lifetimeDays % 365) / 30);
+
+        // Percentage of remaining life
+        const totalRemainingDays = yearsRemaining * 365;
+        const lifetimePercent = (lifetimeDays / totalRemainingDays) * 100;
+
+        // Update UI
+        displayResults(
+          hours,
+          minutes,
+          yearlyMonths,
+          yearlyDaysRemainder,
+          yearlyPercent,
+          lifetimeYears,
+          lifetimeMonths,
+          lifetimePercent,
+          lifeExpectancy,
+          gender
+        );
+      }
+
+      function displayResults(
+        hours,
+        minutes,
+        yearlyMonths,
+        yearlyDays,
+        yearlyPercent,
+        lifetimeYears,
+        lifetimeMonths,
+        lifetimePercent,
+        lifeExpectancy,
+        gender
+      ) {
+        // Get current age for display
+        const currentAge = parseInt(document.getElementById("age").value);
+        
+        // Show results
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.classList.add("show");
+
+        // Daily display
+        let dailyText = "";
+        if (hours > 0 && minutes > 0) {
+          dailyText = `${hours}h ${minutes}m`;
+        } else if (hours > 0) {
+          dailyText = `${hours} ${hours === 1 ? "hour" : "hours"}`;
+        } else {
+          dailyText = `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+        }
+        document.getElementById("dailyTime").textContent = dailyText;
+
+        // Yearly display
+        let yearlyText = "";
+        if (yearlyMonths > 0) {
+          yearlyText = `${yearlyMonths} ${
+            yearlyMonths === 1 ? "month" : "months"
+          }`;
+          if (yearlyDays > 0) {
+            yearlyText += ` ${yearlyDays} ${
+              yearlyDays === 1 ? "day" : "days"
+            }`;
+          }
+        } else {
+          yearlyText = `${yearlyDays} ${yearlyDays === 1 ? "day" : "days"}`;
+        }
+
+        document.getElementById("yearlyTime").textContent = yearlyText;
+        document.getElementById(
+          "yearlySubtext"
+        ).textContent = `${yearlyPercent.toFixed(1)}% of your entire year`;
+
+        // Lifetime display
+        let lifetimeText = `${lifetimeYears} ${
+          lifetimeYears === 1 ? "year" : "years"
+        }`;
+        if (lifetimeMonths > 0) {
+          lifetimeText += ` ${lifetimeMonths} ${
+            lifetimeMonths === 1 ? "month" : "months"
+          }`;
+        }
+
+        document.getElementById("lifetimeTime").textContent = lifetimeText;
+        document.getElementById(
+          "lifetimeSubtext"
+        ).textContent = `From now until age ${lifeExpectancy}`;
+
+        // Update dramatic message
+        let dailyUsageText = "";
+        if (hours > 0 && minutes > 0) {
+          dailyUsageText = `${hours} hours and ${minutes} minutes`;
+        } else if (hours > 0) {
+          dailyUsageText = `${hours} ${hours === 1 ? "hour" : "hours"}`;
+        } else {
+          dailyUsageText = `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+        }
+        
+        document.getElementById("dailyUsage").textContent = dailyUsageText;
+        document.getElementById("lifetimeUsage").textContent = lifetimeText;
+
+        // Calculate total months for pie chart
+        const yearsRemaining = lifeExpectancy - currentAge;
+        const totalMonthsRemaining = yearsRemaining * 12;
+        const screentimeMonths = lifetimeYears * 12 + lifetimeMonths;
+        
+        // Calculate sleep (8 hours/day = 33.33% of life)
+        const sleepMonths = totalMonthsRemaining * 0.3333;
+        
+        // Calculate work (8 hours/day during working years: age 22-65)
+        let workMonths = 0;
+        const workStartAge = 22;
+        const workEndAge = 65;
+        
+        if (currentAge < workEndAge) {
+          const workingYearsStart = Math.max(currentAge, workStartAge);
+          const workingYearsEnd = Math.min(lifeExpectancy, workEndAge);
+          const workingYears = Math.max(0, workingYearsEnd - workingYearsStart);
+          workMonths = workingYears * 12 * 0.3333; // 8 hours/day = 33.33%
+        }
+        
+        // Calculate "living" time (everything else)
+        const otherMonths = Math.max(0, totalMonthsRemaining - sleepMonths - workMonths - screentimeMonths);
+
+        // Update pie chart
+        drawMultiSlicePieChart(
+          sleepMonths, 
+          workMonths, 
+          screentimeMonths, 
+          otherMonths, 
+          totalMonthsRemaining,
+          currentAge,
+          lifeExpectancy,
+          yearsRemaining
+        );
+
+        // Update legends with years/months format
+        updateLegend("legendSleep", sleepMonths, totalMonthsRemaining);
+        updateLegend("legendWork", workMonths, totalMonthsRemaining);
+        updateLegend("legendScreentime", screentimeMonths, totalMonthsRemaining);
+        updateLegend("legendOther", otherMonths, totalMonthsRemaining);
+
+        // Update age labels
+        document.getElementById("currentAge").textContent = currentAge;
+        document.getElementById("endAge").textContent = lifeExpectancy;
+
+        // Life expectancy note
+        const genderText = gender === "male" ? "males" : "females";
+        document.getElementById("lifeExpectancyNote").textContent =
+          `Based on average life expectancy of ${lifeExpectancy} years for ${genderText} in developed countries.`;
+
+        // Warning box
+        const warningBox = document.getElementById("warningBox");
+        const warningText = document.getElementById("warningText");
+
+        if (yearlyPercent > 30 || lifetimePercent > 20) {
+          warningBox.style.display = "block";
+          let warnings = [];
+
+          if (yearlyPercent > 30) {
+            warnings.push(
+              `You're spending over ${yearlyPercent.toFixed(
+                0
+              )}% of your year looking at screens.`
+            );
+          }
+
+          if (lifetimePercent > 20) {
+            warnings.push(
+              `If you continue at this rate, you'll spend ${lifetimePercent.toFixed(
+                0
+              )}% of your remaining life on screens.`
+            );
+          }
+
+          if (hours >= 8) {
+            warnings.push(
+              "That's equivalent to a full-time job spent on screens!"
+            );
+          }
+
+          warningText.textContent = warnings.join(" ");
+        } else {
+          warningBox.style.display = "none";
+        }
+      }
+
+      function updateLegend(elementId, months, totalMonths) {
+        const years = Math.floor(months / 12);
+        const monthsRemainder = Math.round(months % 12);
+        const percentage = (months / totalMonths) * 100;
+        
+        let label = "";
+        if (years > 0) {
+          label = `${years} ${years === 1 ? "year" : "years"}`;
+          if (monthsRemainder > 0) {
+            label += `, ${monthsRemainder} ${monthsRemainder === 1 ? "mo" : "mos"}`;
+          }
+        } else {
+          label = `${monthsRemainder} ${monthsRemainder === 1 ? "month" : "months"}`;
+        }
+        
+        document.getElementById(elementId).textContent = label;
+        document.getElementById(elementId + "Percent").textContent = `${percentage.toFixed(1)}%`;
+      }
+
+      function drawMultiSlicePieChart(sleepMonths, workMonths, screentimeMonths, otherMonths, totalMonths, currentAge, lifeExpectancy, yearsRemaining) {
+        // Update center text
+        document.getElementById("ageRangeText").textContent = `Age ${currentAge}-${lifeExpectancy}`;
+        document.getElementById("totalYearsText").textContent = `${yearsRemaining} years`;
+
+        const radius = 140;
+        const centerX = 150;
+        const centerY = 150;
+
+        // Calculate percentages and cumulative angles
+        const sleepPercent = (sleepMonths / totalMonths) * 100;
+        const workPercent = (workMonths / totalMonths) * 100;
+        const screentimePercent = (screentimeMonths / totalMonths) * 100;
+        const otherPercent = (otherMonths / totalMonths) * 100;
+
+        // Draw each slice
+        let currentAngle = 0;
+
+        // Sleep slice (purple)
+        if (sleepPercent > 0) {
+          drawSlice("sleepSlice", currentAngle, sleepPercent, radius, centerX, centerY);
+          currentAngle += sleepPercent;
+        }
+
+        // Work slice (orange)
+        if (workPercent > 0) {
+          drawSlice("workSlice", currentAngle, workPercent, radius, centerX, centerY);
+          currentAngle += workPercent;
+        }
+
+        // Screentime slice (gradient purple)
+        if (screentimePercent > 0) {
+          drawSlice("screentimeSlice", currentAngle, screentimePercent, radius, centerX, centerY);
+          currentAngle += screentimePercent;
+        }
+
+        // Other/Living slice (teal)
+        if (otherPercent > 0) {
+          drawSlice("otherSlice", currentAngle, otherPercent, radius, centerX, centerY);
+        }
+      }
+
+      function drawSlice(elementId, startPercent, sizePercent, radius, centerX, centerY) {
+        const slice = document.getElementById(elementId);
+        
+        if (sizePercent === 0) {
+          slice.setAttribute("d", "");
+          return;
+        }
+
+        // Convert percentages to angles
+        const startAngle = (startPercent / 100) * 360 - 90; // -90 to start from top
+        const endAngle = ((startPercent + sizePercent) / 100) * 360 - 90;
+
+        // Convert to radians
+        const startRadians = startAngle * (Math.PI / 180);
+        const endRadians = endAngle * (Math.PI / 180);
+
+        // Calculate start and end points
+        const startX = centerX + radius * Math.cos(startRadians);
+        const startY = centerY + radius * Math.sin(startRadians);
+        const endX = centerX + radius * Math.cos(endRadians);
+        const endY = centerY + radius * Math.sin(endRadians);
+
+        // Determine if we need large arc flag
+        const largeArc = sizePercent > 50 ? 1 : 0;
+
+        // Create path
+        const path = [
+          `M ${centerX} ${centerY}`, // Start at center
+          `L ${startX} ${startY}`, // Line to start of arc
+          `A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY}`, // Arc
+          `Z` // Close path back to center
+        ].join(" ");
+
+        slice.setAttribute("d", path);
+      }
+
+      // Add animation class on value change
+      document
+        .getElementById("hours")
+        .addEventListener("input", function () {
+          document.getElementById("hoursValue").classList.add("animated");
+          setTimeout(() => {
+            document
+              .getElementById("hoursValue")
+              .classList.remove("animated");
+          }, 500);
+        });
+
+      document
+        .getElementById("minutes")
+        .addEventListener("input", function () {
+          document.getElementById("minutesValue").classList.add("animated");
+          setTimeout(() => {
+            document
+              .getElementById("minutesValue")
+              .classList.remove("animated");
+          }, 500);
+        });
+    </script>
+  </body>
+</html>

@@ -1,17 +1,14 @@
-from flask import Flask, render_template, url_for, redirect, request, session
+from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from calculation import yearly_screen_time, life_expectancy, lifetime_screentime
 from dotenv import load_dotenv
 import os
 
-
-
 app = Flask(__name__)
 load_dotenv()
-app.secret_key= os.getenv("SECRET_KEY")
+app.secret_key = os.getenv("SECRET_KEY")
 
-##Creating database
+# Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -19,71 +16,55 @@ db = SQLAlchemy(app)
 
 
 class user_data(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     age = db.Column(db.Integer)
     gender = db.Column(db.String(100))
     avg_screentime = db.Column(db.Float)
-    created_at = db.Column(db.DateTime, default= datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __init__(self, age, gender, avg_screentime, created_at):
         self.age = age
         self.gender = gender
         self.avg_screentime = avg_screentime
         self.created_at = created_at
-        
 
 
-@app.route("/", methods=["POST","GET"])
+# Serve the new frontend
+@app.route("/")
 def home():
-    results = None
-    if request.method =="POST":
-        hours = float(request.form["hours"])
-        minutes = float(request.form["minutes"])
-        age = int(request.form["age"])
-        gender = request.form["gender"]
-        avg_screentime = hours + minutes/60 # converting time into a decimal
-        created_at= datetime.now()
+    return render_template("screentime-enhanced.html")
 
-        #Adding user to the database
+
+# NEW: API endpoint to save data
+@app.route("/save-data", methods=["POST"])
+def save_data():
+    try:
+        data = request.json
+        hours = float(data['hours'])
+        minutes = float(data['minutes'])
+        age = int(data['age'])
+        gender = data['gender']
+        avg_screentime = hours + minutes / 60
+        created_at = datetime.now()
+
+        # Add user to database
         new_user = user_data(
-            age = age, gender = gender, 
-            avg_screentime = avg_screentime, created_at= created_at
-            )
+            age=age,
+            gender=gender,
+            avg_screentime=avg_screentime,
+            created_at=created_at
+        )
         db.session.add(new_user)
         db.session.commit()
 
-        #Calculations
-        yearly = yearly_screen_time(avg_screentime)
-        life_exp = life_expectancy(gender, age)
-        lifetime = lifetime_screentime(avg_screentime, life_exp)
-
-        # Creating a dictionary with the data and results
-        session["results"]={
-            "hours": int(hours),
-            "minutes": int(minutes),
-            "screentime": avg_screentime,
-            "gender": gender,
-            "age": age,
-            "yearly_summary":{
-                "months": yearly[0],
-                "days": yearly[1]
-                },
-            "life_expectancy": life_exp,
-            "lifetime_use": {
-                "years": lifetime[0],
-                "months": lifetime[1],
-                }
-        }
-        return redirect(url_for("home"))
-
-    results = session.pop("results", None)
-    return render_template("index_wmobile.html", results = results)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
-#This is temporary to create the DB(once)
+# Keep this commented unless you need to create DB again
 # with app.app_context():
 #     db.create_all()
 
 if __name__ == "__main__":
-    app.run()
-
+    app.run(debug=True)
